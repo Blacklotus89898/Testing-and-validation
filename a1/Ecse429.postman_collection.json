@@ -1,0 +1,59 @@
+{
+	"info": {
+		"_postman_id": "c34e7dff-1abe-464d-8b94-ee0f194a5b19",
+		"name": "Ecse429",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27831706",
+		"_collection_link": "https://lively-trinity-767203.postman.co/workspace/My-Workspace~b1a717c1-2895-4bfe-814a-71ec1046ee8d/collection/27831706-c34e7dff-1abe-464d-8b94-ee0f194a5b19?action=share&source=collection_link&creator=27831706"
+	},
+	"item": [
+		{
+			"name": "/todos",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/todos",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/projects",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/projects",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"projects"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
