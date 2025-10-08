@@ -5,7 +5,6 @@ Random Test Runner - Runs tests in random order to verify test independence
 import unittest
 import random
 import sys
-import time
 
 def run_tests_randomly():
     """Run tests in random order with a random seed"""

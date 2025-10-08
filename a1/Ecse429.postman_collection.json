@@ -8,50 +8,2340 @@
 	},
 	"item": [
 		{
-			"name": "/todos",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "",
-						"type": "text",
-						"disabled": true
-					}
-				],
-				"url": {
-					"raw": "{{baseURL}}/todos",
-					"host": [
-						"{{baseURL}}"
-					],
-					"path": [
-						"todos"
+			"name": "JSON",
+			"item": [
+				{
+					"name": "Todos",
+					"item": [
+						{
+							"name": "/todos",
+							"item": [
+								{
+									"name": "/todos",
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos",
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"Check emails\",\r\n  \"doneStatus\": false,\r\n  \"description\": \"Respond to my important emails\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos",
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "OPTIONS",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id",
+							"item": [
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"doneStatus\": true,\r\n    \"description\": \"A new description here!\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"title\": \"Since this one replaces the todo, a new title is required!\",\r\n    \"description\": \"Updated the description here!\",\r\n    \"doneStatus\": false\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/tasksof",
+							"item": [
+								{
+									"name": "/todos/:id/tasksof",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/tasksof",
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/tasksof",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"2\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/tasksof/:id",
+							"item": [
+								{
+									"name": "/todos/:id/tasksof/:id2",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof/:id2",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof",
+												":id2"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												},
+												{
+													"key": "id2",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/categories",
+							"item": [
+								{
+									"name": "/todos/:id/categories",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/categories",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/categories",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"2\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/categories/:id",
+							"item": [
+								{
+									"name": "/todos/:id/categories/:id2",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories/:id2",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories",
+												":id2"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												},
+												{
+													"key": "id2",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Projects",
+					"item": [
+						{
+							"name": "/projects",
+							"item": [
+								{
+									"name": "GET /projects (Get all projects)",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											],
+											"query": [
+												{
+													"key": "title",
+													"value": null,
+													"disabled": true
+												},
+												{
+													"key": "completed",
+													"value": null,
+													"disabled": true
+												},
+												{
+													"key": "active",
+													"value": "true",
+													"disabled": true
+												},
+												{
+													"key": "description",
+													"value": null,
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects (Get all projects) Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											],
+											"query": [
+												{
+													"key": "title",
+													"value": null,
+													"disabled": true
+												},
+												{
+													"key": "completed",
+													"value": null,
+													"disabled": true
+												},
+												{
+													"key": "active",
+													"value": "true",
+													"disabled": true
+												},
+												{
+													"key": "description",
+													"value": null,
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "PATCH /projects",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "OPTIONS /projects",
+									"request": {
+										"method": "OPTIONS",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "HEAD /projects",
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST /projects (Create new project)",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"New Project\",\n    \"description\": \"Example project description\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/projects",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/projects/{id}",
+							"item": [
+								{
+									"name": "GET /projects/{id} (Get project by ID)",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Head /projects/{id}",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "PATCH /projects/{id} Copy",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Options /projects/{id} Copy",
+									"request": {
+										"method": "OPTIONS",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST /projects/{id} (Update project fields)",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"description\": \"Updated project description\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "PUT /projects/{id} (Replace project)",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"title\": \"Replaced Project\",\n    \"description\": \"New content replacing entire project\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id} (Delete project)",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/projects/{id}/tasks",
+							"item": [
+								{
+									"name": "GET /projects/{id}/tasks (Get all tasks in project)",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/tasks (Get all tasks in project) Copy",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/tasks (Get all tasks in project) Copy 2",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/tasks (Get all tasks in project) Copy 3",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/tasks (Get all tasks in project) Copy 4",
+									"request": {
+										"method": "OPTIONS",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/tasks (Get all tasks in project) Copy 2",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST /projects/{id}/tasks (Add task to project)",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"1\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/projects/{id}/tasks/{todoId}",
+							"item": [
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project)",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project) Copy",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project) Copy 2",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project) Copy 3",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project) Copy 4",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project) Copy 5",
+									"request": {
+										"method": "OPTIONS",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/tasks/{todoId} (Unlink task from project) Copy",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/tasks/{{todoId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"tasks",
+												"{{todoId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/projects/{id}/categories",
+							"item": [
+								{
+									"name": "GET /projects/{id}/categories (Get categories linked to project)",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/categories (Get categories linked to project) Copy",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/categories (Get categories linked to project) Copy 2",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/categories (Get categories linked to project) Copy 3",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/categories (Get categories linked to project) Copy 4",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "GET /projects/{id}/categories (Get categories linked to project) Copy 5",
+									"request": {
+										"method": "OPTIONS",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "POST /projects/{id}/categories (Link category to project)",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"1\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/projects/{id}/categories/{catId}",
+							"item": [
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project)",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project) Copy",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project) Copy 2",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project) Copy 3",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project) Copy 4",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project) Copy 5",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "DELETE /projects/{id}/categories/{catId} (Unlink category from project) Copy 6",
+									"request": {
+										"method": "OPTIONS",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/projects/{{id}}/categories/{{catId}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"projects",
+												"{{id}}",
+												"categories",
+												"{{catId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
 					]
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "/projects",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{baseURL}}/projects",
-					"host": [
-						"{{baseURL}}"
-					],
-					"path": [
-						"projects"
+			"name": "XML",
+			"item": [
+				{
+					"name": "Todos",
+					"item": [
+						{
+							"name": "/todos",
+							"item": [
+								{
+									"name": "/todos",
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/xml",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos",
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/xml",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": " <todo>\r\n     <title>Check emails</title>\r\n     <doneStatus>false</doneStatus>\r\n     <description>Respond to my important emails</description>\r\n </todo>",
+											"options": {
+												"raw": {
+													"language": "xml"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos",
+									"protocolProfileBehavior": {
+										"disabledSystemHeaders": {
+											"accept": true
+										}
+									},
+									"request": {
+										"method": "OPTIONS",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id",
+							"item": [
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "HEAD",
+										"header": [],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"doneStatus\": true,\r\n    \"description\": \"A new description here!\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/xml",
+												"type": "text"
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "<todo>\r\n     <title>Since this one replaces the todo, a new title is required!</title>\r\n     <description>Updated the description here!</description>\r\n     <doneStatus>false</doneStatus>\r\n</todo>",
+											"options": {
+												"raw": {
+													"language": "xml"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/tasksof",
+							"item": [
+								{
+									"name": "/todos/:id/tasksof",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/tasksof",
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/tasksof",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"2\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/tasksof/:id",
+							"item": [
+								{
+									"name": "/todos/:id/tasksof/:id2",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "Accept",
+												"value": "application/xml",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/tasksof/:id2",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"tasksof",
+												":id2"
+											],
+											"query": [
+												{
+													"key": "description",
+													"value": "",
+													"disabled": true
+												}
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												},
+												{
+													"key": "id2",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/categories",
+							"item": [
+								{
+									"name": "/todos/:id/categories",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/categories",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "HEAD",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "/todos/:id/categories",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"2\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/todos/:id/categories/:id",
+							"item": [
+								{
+									"name": "/todos/:id/categories/:id2",
+									"request": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"url": {
+											"raw": "{{baseURL}}/todos/:id/categories/:id2",
+											"host": [
+												"{{baseURL}}"
+											],
+											"path": [
+												"todos",
+												":id",
+												"categories",
+												":id2"
+											],
+											"variable": [
+												{
+													"key": "id",
+													"value": "1"
+												},
+												{
+													"key": "id2",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
 					]
 				}
-			},
-			"response": []
+			]
 		}
 	],
 	"variable": [
 		{
 			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "id",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "baseUrl",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "todoId",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "catId",
 			"value": "",
 			"type": "default"
 		}

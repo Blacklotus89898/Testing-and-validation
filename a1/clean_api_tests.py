@@ -2,12 +2,11 @@ import unittest
 import requests
 import sys
 import uuid
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, List
 import json
 import subprocess
 import time
 import os
-import signal
 import psutil
 
 try:
