@@ -79,19 +79,55 @@ class APIClient:
 
 
 def contains_expected_subset(expected, actual):
-    """Recursively check if expected dict is a subset of actual (JSON), with sorted list comparison."""
-    if isinstance(actual, dict):
-        if all(k in actual and actual[k] == v for k, v in expected.items()):
-            return True
-        return any(contains_expected_subset(expected, v) for v in actual.values())
-    elif isinstance(actual, list):
-        sorted_list = sorted(
-            actual,
-            key=lambda x: tuple(sorted(x.items())) if isinstance(x, dict) else str(x),
-        )
-        return any(contains_expected_subset(expected, item) for item in sorted_list)
-    return False
+    """
+    Recursively check whether `expected` (a dict/list/primitive) appears anywhere
+    inside `actual` (a dict/list/primitive). For lists, each expected element must
+    be found in some element of the actual list (order-insensitive).
+    """
+    # If expected is a dict, try to match it inside actual
+    if isinstance(expected, dict):
+        # If actual is a dict, first try a direct subset match
+        if isinstance(actual, dict):
+            direct = True
+            for k, v in expected.items():
+                if k not in actual:
+                    direct = False
+                    break
+                if not contains_expected_subset(v, actual[k]):
+                    direct = False
+                    break
+            if direct:
+                return True
+            # not a direct match — search each value of actual recursively
+            return any(contains_expected_subset(expected, val) for val in actual.values())
 
+        # If actual is a list, check whether any item in the list contains the expected dict
+        if isinstance(actual, list):
+            return any(contains_expected_subset(expected, item) for item in actual)
+
+        # primitive cannot contain a dict
+        return False
+
+    # If expected is a list, require that each expected element is found somewhere in actual
+    if isinstance(expected, list):
+        if isinstance(actual, list):
+            # for each expected item there must exist an actual item that matches it
+            for e in expected:
+                found = False
+                for a in actual:
+                    if contains_expected_subset(e, a):
+                        found = True
+                        break
+                if not found:
+                    return False
+            return True
+        # if actual is a dict, try searching its values
+        if isinstance(actual, dict):
+            return any(contains_expected_subset(expected, val) for val in actual.values())
+        return False
+
+    # expected is a primitive (string/int/bool/etc.) — compare directly
+    return expected == actual
 
 def xml_contains_subset(expected, actual):
     """Recursively check if expected tags/text exist anywhere in actual XML tree."""

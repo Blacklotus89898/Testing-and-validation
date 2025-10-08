@@ -39,15 +39,18 @@ pip install -r requirements.txt
 
 
 ### Todos Endpoint
+This implementation starts the system at the beginning of each test which takes a longer runtime
 ```bash
 # Todo testing
 python .\random_todo_test_runner.py  
 ```
 ### Projects Endpoint
-This implementation shows what happens if a system is not started so it requires starting the system
+This implementation shows what happens if a system is not started by stoping the test
+
+By tracking the state, we don't need to restart the server which makes the test quicker
 ```bash
 # Start the Server
 java -jar .\runTodoManagerRestAPI-1.5.5.jar
 # Project testing
 python .\random_project_test_runner.py  
-```
+``` 
