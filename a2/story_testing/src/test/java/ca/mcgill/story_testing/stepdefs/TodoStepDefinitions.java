@@ -28,7 +28,10 @@ public class TodoStepDefinitions {
     private String requestBody;
     private final String BASE_URL = "http://localhost:4567";
     private Map<String, String> currentFields;
-    private JSONObject lastCreatedResource;
+    private JSONObject lastCreatedResource; // Keeping for backward compatibility
+    private JSONObject lastCreatedTodo;
+    private JSONObject lastCreatedProject;
+    private JSONObject lastCreatedCategory;
     private HttpClient httpClient;
 
     // Setup and teardown
@@ -37,6 +40,9 @@ public class TodoStepDefinitions {
         httpClient = HttpClient.newHttpClient();
         currentFields = new HashMap<>();
         lastCreatedResource = null;
+        lastCreatedTodo = null;
+        lastCreatedProject = null;
+        lastCreatedCategory = null;
         requestBody = null;
     }
 
@@ -46,6 +52,9 @@ public class TodoStepDefinitions {
         httpClient = null;
         currentFields = null;
         lastCreatedResource = null;
+        lastCreatedTodo = null;
+        lastCreatedProject = null;
+        lastCreatedCategory = null;
         requestBody = null;
     }
 
@@ -58,38 +67,41 @@ public class TodoStepDefinitions {
 
     @Given("the system has been reset to a clean state")
     public void resetSystemToCleanState() throws IOException, InterruptedException {
-        // Send shutdown request to the server
-        try {
-            sendRequest("POST", "/shutdown", null);
-        } catch (IOException | InterruptedException e) {
-            // Ignore connection errors as server will be down
-        }
-        
-        // Give the server more time to fully shutdown and release resources
-        Thread.sleep(3000);
-        
-        // Start the server again using ProcessBuilder
-        ProcessBuilder pb = new ProcessBuilder("java", "-jar", "runTodoManagerRestAPI-1.5.5.jar");
-        pb.directory(new File(System.getProperty("user.dir")).getParentFile());
-        pb.start();
-        
-        // Give the server more time to fully initialize
-        Thread.sleep(4000);
-        
-        // Verify server is running
-        for (int i = 0; i < 5; i++) { // Try up to 5 times
-            try {
-                response = sendRequest("GET", "/todos", null);
-                if (response.statusCode() == 200) {
-                    return; // Server is up and running
-                }
-            } catch (IOException | InterruptedException e) {
-                // Server might not be ready yet
-                Thread.sleep(1000);
+        // Delete all todos
+        response = sendRequest("GET", "/todos", null);
+        if (response.statusCode() == 200) {
+            JSONObject resp = new JSONObject(response.body());
+            JSONArray todos = resp.getJSONArray("todos");
+            for (int i = 0; i < todos.length(); i++) {
+                JSONObject todo = todos.getJSONObject(i);
+                String id = todo.getString("id");
+                sendRequest("DELETE", "/todos/" + id, null);
             }
         }
-        
-        throw new RuntimeException("Failed to restart the server after multiple attempts");
+
+        // Delete all projects
+        response = sendRequest("GET", "/projects", null);
+        if (response.statusCode() == 200) {
+            JSONObject resp = new JSONObject(response.body());
+            JSONArray projects = resp.getJSONArray("projects");
+            for (int i = 0; i < projects.length(); i++) {
+                JSONObject project = projects.getJSONObject(i);
+                String id = project.getString("id");
+                sendRequest("DELETE", "/projects/" + id, null);
+            }
+        }
+
+        // Delete all categories
+        response = sendRequest("GET", "/categories", null);
+        if (response.statusCode() == 200) {
+            JSONObject resp = new JSONObject(response.body());
+            JSONArray categories = resp.getJSONArray("categories");
+            for (int i = 0; i < categories.length(); i++) {
+                JSONObject category = categories.getJSONObject(i);
+                String id = category.getString("id");
+                sendRequest("DELETE", "/categories/" + id, null);
+            }
+        }
     }
 
     // Resource creation steps
@@ -110,9 +122,6 @@ public class TodoStepDefinitions {
         if (!field.equals("description")) {
             currentFields.put("description", "Default Description");
         }
-        if (!field.equals("doneStatus")) {
-            currentFields.put("doneStatus", "false");
-        }
     }
 
     @Given("I have a todo with title {string} and the following optional fields")
@@ -130,13 +139,54 @@ public class TodoStepDefinitions {
 
     // Resource existence verification
     @Given("a todo already exists in the system")
-    public void verifyTodoExists() {
-        // Using the default todo with id 1 that exists when server starts
+    public void verifyTodoExists() throws IOException, InterruptedException {
+        JSONObject todoData = new JSONObject();
+        todoData.put("title", "Original Title");
+        response = sendRequest("POST", "/todos", todoData.toString());
+        assertEquals(201, response.statusCode(), "Todo should be created successfully");
+        if (response.statusCode() == 201) {
+            lastCreatedResource = new JSONObject(response.body()); // Keep for backward compatibility
+            lastCreatedTodo = new JSONObject(response.body());
+        }
+    }
+
+    @Given("a project already exists in the system")
+    public void verifyProjectExists() throws IOException, InterruptedException {
+        JSONObject projectData = new JSONObject();
+        projectData.put("title", "Existing Project");
+        projectData.put("description", "An existing project for testing");
+        response = sendRequest("POST", "/projects", projectData.toString());
+        assertEquals(201, response.statusCode(), "Project should be created successfully");
+        if (response.statusCode() == 201) {
+            lastCreatedProject = new JSONObject(response.body());
+        }
+    }
+
+    @Given("a category already exists in the system")
+    public void verifyCategoryExists() throws IOException, InterruptedException {
+        JSONObject categoryData = new JSONObject();
+        categoryData.put("title", "Existing Category");
+        categoryData.put("description", "An existing category for testing");
+        response = sendRequest("POST", "/categories", categoryData.toString());
+        assertEquals(201, response.statusCode(), "Category should be created successfully");
+        if (response.statusCode() == 201) {
+            lastCreatedCategory = new JSONObject(response.body());
+        }
     }
 
     @Given("there are existing todos in the system")
-    public void createExistingTodos() {
-        // do nothing
+    public void createExistingTodos() throws IOException, InterruptedException {
+        // Create first todo
+        JSONObject firstTodo = new JSONObject();
+        firstTodo.put("title", "First todo");
+        response = sendRequest("POST", "/todos", firstTodo.toString());
+        assertEquals(201, response.statusCode(), "First todo should be created successfully");
+
+        // Create second todo
+        JSONObject secondTodo = new JSONObject();
+        secondTodo.put("title", "Second todo");
+        response = sendRequest("POST", "/todos", secondTodo.toString());
+        assertEquals(201, response.statusCode(), "Second todo should be created successfully");
     }
 
     @Given("the system has no todos")
@@ -170,11 +220,20 @@ public class TodoStepDefinitions {
     // Action steps - Creation
     @When("I create the todo")
     public void createTodo() throws IOException, InterruptedException {
-        JSONObject todoData = new JSONObject(currentFields);
+        JSONObject todoData = new JSONObject();
+        // Convert doneStatus string to boolean if present
+        for (Map.Entry<String, String> entry : currentFields.entrySet()) {
+            if (entry.getKey().equals("doneStatus")) {
+                todoData.put(entry.getKey(), Boolean.parseBoolean(entry.getValue()));
+            } else {
+                todoData.put(entry.getKey(), entry.getValue());
+            }
+        }
         requestBody = todoData.toString();
         response = sendRequest("POST", "/todos", requestBody);
         if (response.statusCode() == 201) {
-            lastCreatedResource = new JSONObject(response.body());
+            lastCreatedResource = new JSONObject(response.body()); // Keep for backward compatibility
+            lastCreatedTodo = new JSONObject(response.body());
         }
     }
 
@@ -186,9 +245,11 @@ public class TodoStepDefinitions {
             response = sendRequest("POST", "/todos", requestBody);
             // Expecting a client error (e.g., 400). Do not populate lastCreatedResource on failure.
             if (response.statusCode() == 201) {
-                lastCreatedResource = new JSONObject(response.body());
+                lastCreatedResource = new JSONObject(response.body()); // Keep for backward compatibility
+                lastCreatedTodo = new JSONObject(response.body());
             } else {
                 lastCreatedResource = null;
+                lastCreatedTodo = null;
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to send create request", e);
@@ -203,7 +264,8 @@ public class TodoStepDefinitions {
         requestBody = todoData.toString();
         response = sendRequest("POST", "/todos", requestBody);
         if (response.statusCode() == 201) {
-            lastCreatedResource = new JSONObject(response.body());
+            lastCreatedResource = new JSONObject(response.body()); // Keep for backward compatibility
+            lastCreatedTodo = new JSONObject(response.body());
         }
     }
     
@@ -224,7 +286,20 @@ public class TodoStepDefinitions {
     public void updateTodoTitle() throws IOException, InterruptedException {
         JSONObject updateData = new JSONObject();
         updateData.put("title", "Updated Title");
-        response = sendRequest("PUT", "/todos/1", updateData.toString());
+
+        // Get the ID of the last created todo
+        String todoId;
+        if (lastCreatedResource != null) {
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+            response = sendRequest("PUT", "/todos/" + todoId, updateData.toString());
+        } else {
+            // Fallback to todo/1 if no todo was created in previous step
+            response = sendRequest("PUT", "/todos/1", updateData.toString());
+        }
     }
 
 
@@ -232,7 +307,20 @@ public class TodoStepDefinitions {
     public void updateTodoDescription() throws IOException, InterruptedException {
         JSONObject updateData = new JSONObject();
         updateData.put("description", "Updated description");
-        response = sendRequest("POST", "/todos/1", updateData.toString());
+
+        // Get the ID of the last created todo
+        String todoId;
+        if (lastCreatedResource != null) {
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+        } else {
+            todoId = "1"; // Fallback to todo/1 if no todo was created
+        }
+
+        response = sendRequest("POST", "/todos/" + todoId, updateData.toString());
     }
 
     @When("I attempt to update a todo that does not exist")
@@ -244,17 +332,36 @@ public class TodoStepDefinitions {
     // Action steps - Linking
     @When("I link the created todo to an existing project")
     public void linkTodoToProject() throws IOException, InterruptedException {
-        if (lastCreatedResource != null) {
-            String todoId;
+        String todoId = null;
+        String projectId = "1"; // Default fallback
+        
+        // Get todo ID
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Backward compatibility
             if (lastCreatedResource.has("todos")) {
                 todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
             } else {
                 todoId = lastCreatedResource.getString("id");
             }
-            
+        }
+        
+        // Get project ID if we have a newly created project
+        if (lastCreatedProject != null) {
+            if (lastCreatedProject.has("projects")) {
+                projectId = lastCreatedProject.getJSONArray("projects").getJSONObject(0).getString("id");
+            } else {
+                projectId = lastCreatedProject.getString("id");
+            }
+        }
+        
+        if (todoId != null) {
             JSONObject requestData = new JSONObject();
-            requestData.put("id", "1"); // Assuming project id 1 exists
-            
+            requestData.put("id", projectId);
             response = sendRequest("POST", "/todos/" + todoId + "/tasksof", requestData.toString());
         }
     }
@@ -262,7 +369,18 @@ public class TodoStepDefinitions {
     @When("I try to link a non-existent todo to a category")
     public void attemptToLinkNonexistentTodoToCategory() throws IOException, InterruptedException {
         JSONObject requestData = new JSONObject();
-        requestData.put("id", "1"); // Using a valid category ID
+        String categoryId = "1"; // Default fallback
+        
+        // Get category ID if we have a newly created category
+        if (lastCreatedCategory != null) {
+            if (lastCreatedCategory.has("categories")) {
+                categoryId = lastCreatedCategory.getJSONArray("categories").getJSONObject(0).getString("id");
+            } else {
+                categoryId = lastCreatedCategory.getString("id");
+            }
+        }
+
+        requestData.put("id", categoryId);
         
         // Using a non-existent todo ID
         response = sendRequest("POST", "/todos/999999/categories", requestData.toString());
@@ -270,50 +388,123 @@ public class TodoStepDefinitions {
 
     @When("I try to link the todo to a non-existent project")
     public void linkTodoToNonExistentProject() throws IOException, InterruptedException {
-        if (lastCreatedResource != null) {
-            String todoId;
+        String todoId = null;
+        
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id"); 
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Fallback for backward compatibility
             if (lastCreatedResource.has("todos")) {
                 todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
             } else {
-                todoId = lastCreatedResource.getString("id");
+                todoId = lastCreatedResource.getString("id"); 
             }
-            
-            // Send an empty JSON object as the body
+        }
+
+        if (todoId != null) {
             JSONObject requestData = new JSONObject();
-            
+            requestData.put("id", "999"); // Use a non-existent project ID
             response = sendRequest("POST", "/todos/" + todoId + "/tasksof", requestData.toString());
         }
     }
 
     @When("I attempt to link the todo without specifying a project")
     public void attemptToLinkTodoWithoutProject() throws IOException, InterruptedException {
-        if (lastCreatedResource != null) {
-            String todoId;
+        String todoId = null;
+        
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Fallback for backward compatibility
             if (lastCreatedResource.has("todos")) {
                 todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
             } else {
                 todoId = lastCreatedResource.getString("id");
             }
-            
+        }
+
+        if (todoId != null) {
             // Send an empty JSON object as the body
             JSONObject requestData = new JSONObject();
-            
             response = sendRequest("POST", "/todos/" + todoId + "/tasksof", requestData.toString());
         }
     }
 
-    @When("I link an existing todo to an existing category")
+    @When("I link the created todo to an existing category")
     public void linkTodoToCategory() throws IOException, InterruptedException {
-        JSONObject requestData = new JSONObject();
-        requestData.put("id", "2"); // Using category id 2
-        response = sendRequest("POST", "/todos/1/categories", requestData.toString()); // Using todo id 1
+        String todoId = null;
+        String categoryId = "1"; // Default fallback
+        
+        // Get todo ID
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Backward compatibility
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+        }
+        
+        // Get category ID if we have a newly created category
+        if (lastCreatedCategory != null) {
+            if (lastCreatedCategory.has("categories")) {
+                categoryId = lastCreatedCategory.getJSONArray("categories").getJSONObject(0).getString("id");
+            } else {
+                categoryId = lastCreatedCategory.getString("id");
+            }
+        }
+
+        if (todoId != null) {
+            JSONObject requestData = new JSONObject();
+            requestData.put("id", categoryId);
+            response = sendRequest("POST", "/todos/" + todoId + "/categories", requestData.toString());
+        }
     }
 
     @When("I attempt to link a todo to a category using a title instead of an ID")
     public void linkTodoToCategoryByTitle() throws IOException, InterruptedException {
+        String todoId = null;
+        
+        // Get todo ID
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Backward compatibility
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+        }
+
         JSONObject requestData = new JSONObject();
         requestData.put("title", "Some Title");
-        response = sendRequest("POST", "/todos/1/categories", requestData.toString());
+
+        if (todoId != null) {
+            response = sendRequest("POST", "/todos/" + todoId + "/categories", requestData.toString());
+            if (response.statusCode() == 201) {
+                lastCreatedCategory = new JSONObject(response.body());
+            }
+        } else {
+            response = sendRequest("POST", "/todos/1/categories", requestData.toString());
+            if (response.statusCode() == 201) {
+                lastCreatedCategory = new JSONObject(response.body());
+            }
+        }
     }
 
     // Response verification steps
@@ -375,6 +566,19 @@ public class TodoStepDefinitions {
         }
     }
 
+    @Then("the error message should be {string}")
+    public void verifyExactErrorMessage(String expectedMessage) {
+        JSONObject responseObject = new JSONObject(response.body());
+        String actualMessage;
+        if (responseObject.has("errorMessages")) {
+            JSONArray errors = responseObject.getJSONArray("errorMessages");
+            actualMessage = String.join(", ", errors.toList().stream().map(Object::toString).toList());
+        } else {
+            actualMessage = responseObject.getString("error");
+        }
+        assertEquals(expectedMessage, actualMessage, "Error message should match exactly");
+    }
+
     // Resource state verification steps
     @Then("the created todo should include the title {string}")
     public void verifyTodoTitle(String expectedTitle) {
@@ -431,14 +635,34 @@ public class TodoStepDefinitions {
 
     @Then("the todo should appear as linked to the project")
     public void verifyTodoProjectLink() throws IOException, InterruptedException {
-        if (lastCreatedResource != null) {
-            String todoId;
+        String todoId = null;
+        String projectId = "1"; // Default fallback
+        
+        // Get todo ID
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Backward compatibility
             if (lastCreatedResource.has("todos")) {
                 todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
             } else {
                 todoId = lastCreatedResource.getString("id");
             }
-            
+        }
+        
+        // Get project ID if we have a newly created project
+        if (lastCreatedProject != null) {
+            if (lastCreatedProject.has("projects")) {
+                projectId = lastCreatedProject.getJSONArray("projects").getJSONObject(0).getString("id");
+            } else {
+                projectId = lastCreatedProject.getString("id");
+            }
+        }
+
+        if (todoId != null) {
             response = sendRequest("GET", "/todos/" + todoId + "/tasksof", null);
             assertEquals(200, response.statusCode(), "Should be able to get todo's projects");
             
@@ -448,34 +672,63 @@ public class TodoStepDefinitions {
             boolean found = false;
             for (int i = 0; i < projects.length(); i++) {
                 JSONObject project = projects.getJSONObject(i);
-                if (project.getString("id").equals("1")) {
+                if (project.getString("id").equals(projectId)) {
                     found = true;
                     break;
                 }
             }
             
-            assertTrue(found, "Todo should be linked to project with id 1");
+            assertTrue(found, "Todo should be linked to project with id " + projectId);
         }
     }
 
     @Then("the todo should appear as linked to the category")
     public void verifyTodoCategoryLink() throws IOException, InterruptedException {
-        response = sendRequest("GET", "/todos/1/categories", null);
-        assertEquals(200, response.statusCode(), "Should be able to get todo's categories");
+        String todoId = null;
+        String categoryId = "1"; // Default fallback
         
-        JSONObject responseObject = new JSONObject(response.body());
-        JSONArray categories = responseObject.getJSONArray("categories");
-        
-        boolean found = false;
-        for (int i = 0; i < categories.length(); i++) {
-            JSONObject category = categories.getJSONObject(i);
-            if (category.getString("id").equals("2")) {
-                found = true;
-                break;
+        // Get todo ID
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id"); 
+            }
+        } else if (lastCreatedResource != null) { // Backward compatibility
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
             }
         }
         
-        assertTrue(found, "Todo should be linked to category with id 2");
+        // Get category ID if we have a newly created category
+        if (lastCreatedCategory != null) {
+            if (lastCreatedCategory.has("categories")) {
+                categoryId = lastCreatedCategory.getJSONArray("categories").getJSONObject(0).getString("id");
+            } else {
+                categoryId = lastCreatedCategory.getString("id");
+            }
+        }
+
+        if (todoId != null) {
+            response = sendRequest("GET", "/todos/" + todoId + "/categories", null);
+            assertEquals(200, response.statusCode(), "Should be able to get todo's categories");
+            
+            JSONObject responseObject = new JSONObject(response.body());
+            JSONArray categories = responseObject.getJSONArray("categories");
+            
+            boolean found = false;
+            for (int i = 0; i < categories.length(); i++) {
+                JSONObject category = categories.getJSONObject(i);
+                if (category.getString("id").equals(categoryId)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            assertTrue(found, "Todo should be linked to category with id " + categoryId);
+        }
     }
 
     @Then("a new empty project should be created and linked to the todo")
@@ -497,13 +750,17 @@ public class TodoStepDefinitions {
             boolean found = false;
             for (int i = 0; i < projects.length(); i++) {
                 JSONObject project = projects.getJSONObject(i);
-                if (project.getString("id").equals("2")) {
-                    found = true;
-                    break;
+                JSONArray tasks = project.getJSONArray("tasks");
+                for (int j = 0; j < tasks.length(); j++) {
+                    if (tasks.getJSONObject(j).getString("id").equals(todoId)) {
+                        found = true;
+                        break;
+                    }
                 }
+                if (found) break;
             }
             
-            assertTrue(found, "Todo should be linked to project with id 2");
+            assertTrue(found, "Todo should be linked to a project");
         }
     }
 
@@ -514,28 +771,69 @@ public class TodoStepDefinitions {
 
     @Then("a new category should be created and linked to the todo")
     public void verifyNewCategoryLink() throws IOException, InterruptedException {
-        response = sendRequest("GET", "/todos/1/categories", null);
-        assertEquals(200, response.statusCode(), "Should be able to get todo's categories");
+        String todoId = null;
+        String categoryId = "1"; // Default fallback
         
-        JSONObject responseObject = new JSONObject(response.body());
-        JSONArray categories = responseObject.getJSONArray("categories");
-        
-        boolean found = false;
-        for (int i = 0; i < categories.length(); i++) {
-            JSONObject category = categories.getJSONObject(i);
-            if (category.getString("id").equals("3")) {
-                found = true;
-                break;
+        // Get todo ID
+        if (lastCreatedTodo != null) {
+            if (lastCreatedTodo.has("todos")) {
+                todoId = lastCreatedTodo.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedTodo.getString("id");
+            }
+        } else if (lastCreatedResource != null) { // Backward compatibility
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
             }
         }
         
-        assertTrue(found, "Todo should be linked to category with id 3");
+        // Get category ID if we have a newly created category
+        if (lastCreatedCategory != null) {
+            if (lastCreatedCategory.has("categories")) {
+                categoryId = lastCreatedCategory.getJSONArray("categories").getJSONObject(0).getString("id");
+            } else {
+                categoryId = lastCreatedCategory.getString("id");
+            }
+        }
+
+        if (todoId != null) {
+            response = sendRequest("GET", "/todos/" + todoId + "/categories", null);
+            assertEquals(200, response.statusCode(), "Should be able to get todo's categories");
+            
+            JSONObject responseObject = new JSONObject(response.body());
+            JSONArray categories = responseObject.getJSONArray("categories");
+            
+            boolean found = false;
+            for (int i = 0; i < categories.length(); i++) {
+                JSONObject category = categories.getJSONObject(i);
+                if (category.getString("id").equals(categoryId)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            assertTrue(found, "Todo should be linked to category with id " + categoryId);
+        }
     }
 
     @Then("the todo's title should reflect the updated value")
     public void verifyUpdatedTitle() throws IOException, InterruptedException {
+        // Get the ID of the last created todo
+        String todoId;
+        if (lastCreatedResource != null) {
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+        } else {
+            todoId = "1"; // Fallback to todo/1 if no todo was created
+        }
+
         // Get the latest state of the todo
-        response = sendRequest("GET", "/todos/1", null);
+        response = sendRequest("GET", "/todos/" + todoId, null);
         JSONObject responseObject = new JSONObject(response.body());
         
         String expectedTitle = "Updated Title";
@@ -549,8 +847,20 @@ public class TodoStepDefinitions {
 
     @Then("the todo's description should reflect the updated value")
     public void verifyUpdatedDescription() throws IOException, InterruptedException {
+        // Get the ID of the last created todo
+        String todoId;
+        if (lastCreatedResource != null) {
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+        } else {
+            todoId = "1"; // Fallback to todo/1 if no todo was created
+        }
+
         // Get the latest state of the todo
-        response = sendRequest("GET", "/todos/1", null);
+        response = sendRequest("GET", "/todos/" + todoId, null);
         JSONObject responseObject = new JSONObject(response.body());
         
         String expectedDescription = "Updated description";
@@ -564,11 +874,23 @@ public class TodoStepDefinitions {
 
     @Then("the todo's title should remain unchanged")
     public void verifyUnchangedTitle() throws IOException, InterruptedException {
+        // Get the ID of the last created todo
+        String todoId;
+        if (lastCreatedResource != null) {
+            if (lastCreatedResource.has("todos")) {
+                todoId = lastCreatedResource.getJSONArray("todos").getJSONObject(0).getString("id");
+            } else {
+                todoId = lastCreatedResource.getString("id");
+            }
+        } else {
+            todoId = "1"; // Fallback to todo/1 if no todo was created
+        }
+
         // Get the latest state of the todo
-        response = sendRequest("GET", "/todos/1", null);
+        response = sendRequest("GET", "/todos/" + todoId, null);
         JSONObject responseObject = new JSONObject(response.body());
         
-        String expectedTitle = "scan paperwork";
+        String expectedTitle = "Original Title";
         if (responseObject.has("todos")) {
             JSONObject todo = responseObject.getJSONArray("todos").getJSONObject(0);
             assertEquals(expectedTitle, todo.getString("title"), "Todo title should remain unchanged");
@@ -595,19 +917,5 @@ public class TodoStepDefinitions {
         return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
     }
 
-    private JSONObject createResource(String resourceType, JSONObject data) throws IOException, InterruptedException {
-        return null;
-    }
 
-    private boolean deleteResource(String resourceType, String id) throws IOException, InterruptedException {
-        return false;
-    }
-
-    private boolean linkResources(String sourceType, String sourceId, String targetType, String targetId) throws IOException, InterruptedException {
-        return false;
-    }
-
-    private HttpResponse<String> updateResource(String resourceType, String id, JSONObject data) throws IOException, InterruptedException {
-        return null;
-    }
 }
