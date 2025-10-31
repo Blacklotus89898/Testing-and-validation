@@ -1,31 +1,31 @@
-Feature: Linking Todos to Projects
+Feature: Linking todos to projects
   As a user of the Todo List API
   I want to link todos to specific projects
-  So that I can organize tasks by project context
+  So that I can organize my tasks by project context
 
   Background:
     Given the Todos API service is running
     And the system has been reset to a clean state
 
-  Scenario: Normal Flow - Successfully link todo to project
+  Scenario: Normal Flow - Successfully link a todo to a project
     When I create a todo with title "New Todo" and description "To be linked"
-    Then the todo response status should be 201
-    When I send a POST request to "/todos/3/tasksof" with body id "1"
-    Then the todo response status should be 201
-    And the todo should be linked to the project
+    Then the operation should succeed with status 201
+    When I link the created todo to an existing project
+    Then the operation should succeed with status 201
+    And the todo should appear as linked to the project
 
-  Scenario: Error Flow - Link todo to invalid project
+  Scenario: Error Flow - Attempt to link a todo to an invalid project
     When I create a todo with title "Another Todo" and description "To be linked"
-    Then the todo response status should be 201
-    When I send a POST request to "/todos/3/tasksof" with body id "999"
-    Then the todo response status should be 404
-    And the error message should indicate "Could not find thing matching value for id"
+    Then the operation should succeed with status 201
+    When I try to link the todo to a non-existent project
+    Then the operation should fail with status 404
+    And the error message should include "Could not find thing matching value for id"
 
-  Scenario: Alternate Flow - Link todo without project ID (Known Bug - Creates Empty Project)
+  Scenario: Alternate Flow - Link todo without specifying a project (Known Bug)
     When I create a todo with title "Todo without project" and description "Testing empty body"
-    Then the todo response status should be 201
-    When I send a POST request to "/todos/3/tasksof" with empty body
-    # Bug: Instead of rejecting the request, it creates a new empty project and links to it
-    Then the todo response status should be 201
-    And the response should contain an empty project with id "2"
-    And the response should show todo "3" linked to project "2"
+    Then the operation should succeed with status 201
+    When I attempt to link the todo without specifying a project
+    Then the operation should succeed with status 201
+    And a new empty project should be created and linked to the todo
+    And the response should show the new project associated with the todo
+    # Known Bug: The system should reject this request, but instead creates a new project automatically.

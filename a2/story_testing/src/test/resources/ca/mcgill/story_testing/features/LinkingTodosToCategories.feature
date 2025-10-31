@@ -1,4 +1,4 @@
-Feature: Linking Todos to Categories
+Feature: Linking todos to categories
   As a user of the Todo List API
   I want to associate todos with categories
   So that I can better organize and filter my tasks
@@ -7,19 +7,18 @@ Feature: Linking Todos to Categories
     Given the Todos API service is running
     And the system has been reset to a clean state
 
-  Scenario: Normal Flow - Successfully link todo to category
-    When I send a POST todo request to "/todos/1/categories" with body id "2"
-    Then the todo response status should be 201
-    And the todo should be linked to the category
+  Scenario: Normal Flow - Successfully link a todo to a category
+    When I link an existing todo to an existing category
+    Then the operation should succeed with status 201
+    And the todo should appear as linked to the category
 
-  Scenario: Error Flow - Link non-existent todo to category
-    When I send a POST todo request to "/todos/999/categories"
-    Then the todo response status should be 404
-    And the error message should indicate "Could not find parent thing for relationship todos/999/categories"
+  Scenario: Error Flow - Attempt to link a non-existent todo to a category
+    When I try to link a non-existent todo to a category
+    Then the operation should fail with status 404
+    And the error message should include "Could not find parent thing for relationship"
 
-  Scenario: Alternate Flow - Link todo with category title instead of ID (Known Bug)
-    When I send a POST todo request to "/todos/1/categories"
-    And the body has title "Some title"
-    Then the todo response status should be 201
-    And the response should show todo "1" linked to category "3"
-    # Bug: API accepts title instead of ID and creates an unintended category
+  Scenario: Alternate Flow - Link todo using category title instead of ID (Known Bug)
+    When I attempt to link a todo to a category using a title instead of an ID
+    Then the operation should succeed with status 201
+    And a new category should be created and linked to the todo
+    # Known Bug: The API incorrectly allows linking by title, creating an unintended category instead of returning an error.

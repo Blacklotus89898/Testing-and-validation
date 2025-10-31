@@ -1,7 +1,7 @@
 Feature: Create new todos
   As a user of the TODO List API
-  I want to create new todos with various field combinations
-  So that I can track tasks effectively
+  I want to create new todos with different field combinations
+  So that I can manage and track my tasks effectively
 
   Background:
     Given the Todos API service is running
@@ -9,35 +9,35 @@ Feature: Create new todos
 
   Scenario Outline: Normal Flow - Successfully create a new todo
     Given I have a todo with title "<title>" and description "<description>"
-    When I send a POST request to "/todos"
-    Then the response status should be 201
-    And the response should contain the title "<title>"
-    And the response should contain the description "<description>"
+    When I create the todo
+    Then the operation should succeed with status 201
+    And the created todo should include the title "<title>"
+    And the created todo should include the description "<description>"
 
     Examples:
-      | title         | description                  |
-      | Buy groceries | Get milk, eggs, and bread    |
-      | Call dentist  | Schedule annual checkup      |
+      | title         | description                |
+      | Buy groceries | Get milk, eggs, and bread  |
+      | Call dentist  | Schedule annual checkup    |
 
   Scenario Outline: Error Flow - Attempt to create a todo with missing required fields
     Given I have a todo with missing field "<field>"
-    When I send a POST request to "/todos"
-    Then the response status should be 400
-    And the error message should contain "<message>"
+    When I try to create the todo
+    Then the operation should fail with status 400
+    And the error message should include "<message>"
 
     Examples:
-      | field  | message                     |
-      | title  | title : field is mandatory  |
-      | both   | title : field is mandatory  |
+      | field | message                    |
+      | title | title : field is mandatory |
+      | both  | title : field is mandatory |
 
   Scenario Outline: Alternate Flow - Create a todo with optional fields
-    Given I have a todo with title "<title>" and optional fields
+    Given I have a todo with title "<title>" and the following optional fields
       | field       | value          |
       | doneStatus  | <done>         |
       | description | <description>  |
-    When I send a POST request to "/todos"
-    Then the response status should be 201
-    And the response should include the optional fields
+    When I create the todo
+    Then the operation should succeed with status 201
+    And the created todo should include the optional fields
 
     Examples:
       | title        | done  | description     |

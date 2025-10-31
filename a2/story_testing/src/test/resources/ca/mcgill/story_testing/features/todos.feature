@@ -108,20 +108,20 @@ Feature: Todo List Management
     Then the todo response status should be 201
     And the response should show todo "1" linked to category "3"
 
-  # Story 5: Managing Todo Completion Status
-  Scenario: Normal Flow - Mark todo as done
+  # Story 5: Updating Todos
+  Scenario: Normal Flow - Update the title of todo
     Given there is a todo with id "1" in the system
-    When I mark the todo as "true" for completion status
+    When I update the todo with a new title
     Then the todo response status should be 200
-    And the todo should be marked as completed
+    And the todo should be updated
 
-  Scenario: Error Flow - Mark non-existent todo as done
-    When I mark todo "999" as "true" for completion status
+  Scenario: Error Flow - Update non-existent todo
+    When I update a non-existent todo
     Then the todo response status should be 404
-    And the error message should indicate "not found"
+    And the error message should include "Invalid GUID for 3 entity todo"
 
-  Scenario: Alternate Flow - Toggle todo completion status
-    Given there is a completed todo with id "1"
-    When I mark the todo as "false" for completion status
+  Scenario: Alternate Flow - Add a description to an existing todo
+    Given there is a todo with id "1" in the system
+    When I update the todo with a new description
     Then the todo response status should be 200
-    And the todo should be marked as not completed
+    And the todo should be updated

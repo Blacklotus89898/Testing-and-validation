@@ -9,17 +9,17 @@ Feature: Retrieve todos
 
   Scenario: Normal Flow - Retrieve all todos
     Given there are existing todos in the system
-    When I send a GET request to "/todos"
-    Then the response status should be 200
-    And the response should contain a list of todos
+    When I request all todos
+    Then the operation should succeed with status 200
+    And the response should include a list of todos
 
   Scenario: Error Flow - Retrieve a non-existent todo
-    When I send a GET request to "/todos/100"
-    Then the response status should be 404
-    And the error message should contain "Could not find an instance with todos/100"
+    When I request the todo with id 100
+    Then the operation should fail with status 404
+    And the error message should include "Could not find an instance with todos/100"
 
   Scenario: Alternate Flow - Retrieve todos when none exist
     Given the system has no todos
-    When I send a GET request to "/todos"
-    Then the response status should be 200
-    And the response should contain an empty list
+    When I request all todos
+    Then the operation should succeed with status 200
+    And the response should include an empty list
