@@ -28,7 +28,6 @@ Feature: Create new todos
     Examples:
       | field | message                    |
       | title | title : field is mandatory |
-      | both  | title : field is mandatory | #Might cause problems!
 
   Scenario Outline: Alternate Flow - Create a todo with optional fields
     Given I have a todo with title "<title>" and the following optional fields

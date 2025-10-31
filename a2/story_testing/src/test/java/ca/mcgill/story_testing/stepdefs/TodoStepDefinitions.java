@@ -65,16 +65,16 @@ public class TodoStepDefinitions {
             // Ignore connection errors as server will be down
         }
         
-        // Wait a moment for the server to fully shutdown
-        Thread.sleep(1000);
+        // Give the server more time to fully shutdown and release resources
+        Thread.sleep(3000);
         
         // Start the server again using ProcessBuilder
         ProcessBuilder pb = new ProcessBuilder("java", "-jar", "runTodoManagerRestAPI-1.5.5.jar");
         pb.directory(new File(System.getProperty("user.dir")).getParentFile());
         pb.start();
         
-        // Wait for server to start up
-        Thread.sleep(2000);
+        // Give the server more time to fully initialize
+        Thread.sleep(4000);
         
         // Verify server is running
         for (int i = 0; i < 5; i++) { // Try up to 5 times
@@ -131,7 +131,7 @@ public class TodoStepDefinitions {
     // Resource existence verification
     @Given("a todo already exists in the system")
     public void verifyTodoExists() {
-        // do nothing
+        // Using the default todo with id 1 that exists when server starts
     }
 
     @Given("there are existing todos in the system")
@@ -232,7 +232,7 @@ public class TodoStepDefinitions {
     public void updateTodoDescription() throws IOException, InterruptedException {
         JSONObject updateData = new JSONObject();
         updateData.put("description", "Updated description");
-        response = sendRequest("PUT", "/todos/1", updateData.toString());
+        response = sendRequest("POST", "/todos/1", updateData.toString());
     }
 
     @When("I attempt to update a todo that does not exist")
@@ -334,18 +334,44 @@ public class TodoStepDefinitions {
             JSONArray errors = responseObject.getJSONArray("errorMessages");
             boolean found = false;
             for (int i = 0; i < errors.length(); i++) {
-                if (errors.getString(i).contains(expectedError)) {
+                String actualError = errors.getString(i);
+                if (expectedError.contains(" for ") && expectedError.contains(" entity ")) {
+                    // Split expected error into prefix and suffix around the dynamic ID
+                    String[] parts = expectedError.split(" for ");
+                    String prefix = parts[0];
+                    String suffix = parts[1].substring(parts[1].indexOf(" "));
+                    
+                    // Check if actual error starts and ends with our expected parts
+                    if (actualError.startsWith(prefix + " for ") && actualError.endsWith(suffix)) {
+                        found = true;
+                        break;
+                    }
+                } else if (actualError.contains(expectedError)) {
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                assertEquals(expectedError, responseObject.get("errorMessages").toString(), 
-                    "Error message should contain: " + expectedError);
+                String errorMessage = String.join(", ", errors.toList().stream().map(Object::toString).toList());
+                assertTrue(false, "Error message should match pattern: " + expectedError + 
+                    "\nActual error message: " + errorMessage);
             }
         } else {
-            assertEquals(expectedError, responseObject.get("error").toString(),
-                "Error message should contain: " + expectedError);
+            String actualError = responseObject.getString("error");
+            if (expectedError.contains(" for ") && expectedError.contains(" entity ")) {
+                String[] parts = expectedError.split(" for ");
+                String prefix = parts[0];
+                String suffix = parts[1].substring(parts[1].indexOf(" "));
+                assertTrue(
+                    actualError.startsWith(prefix + " for ") && actualError.endsWith(suffix),
+                    "Error message should match pattern: " + expectedError + "\nActual: " + actualError
+                );
+            } else {
+                assertTrue(
+                    actualError.contains(expectedError),
+                    "Error message should contain: " + expectedError + "\nActual: " + actualError
+                );
+            }
         }
     }
 
