@@ -11,7 +11,7 @@ Feature: Updating todos
     Given a todo already exists in the system
     When I update the todo with a new title
     Then the operation should succeed with status 200
-    And the todo’s title should reflect the updated value
+    And the todo's title should reflect the updated value
 
   Scenario: Error Flow - Attempt to update a non-existent todo
     When I attempt to update a todo that does not exist
@@ -22,5 +22,5 @@ Feature: Updating todos
     Given a todo already exists in the system
     When I update the todo by adding a description
     Then the operation should succeed with status 200
-    And the todo’s description should reflect the updated value
-    And the todo’s title should remain unchanged
+    And the todo's description should reflect the updated value
+    And the todo's title should remain unchanged

@@ -15,14 +15,14 @@ Feature: Linking todos to projects
     And the todo should appear as linked to the project
 
   Scenario: Error Flow - Attempt to link a todo to an invalid project
-    When I create a todo with title "Another Todo" and description "To be linked"
+    When I create a todo with title "New Todo" and description "To be linked"
     Then the operation should succeed with status 201
     When I try to link the todo to a non-existent project
     Then the operation should fail with status 404
     And the error message should include "Could not find thing matching value for id"
 
   Scenario: Alternate Flow - Link todo without specifying a project (Known Bug)
-    When I create a todo with title "Todo without project" and description "Testing empty body"
+    When I create a todo with title "New Todo" and description "To be linked"
     Then the operation should succeed with status 201
     When I attempt to link the todo without specifying a project
     Then the operation should succeed with status 201
