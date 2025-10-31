@@ -7,7 +7,6 @@ Feature: Create new todos
     Given the Todos API service is running
     And the system has been reset to a clean state
 
-  @focus
   Scenario Outline: Normal Flow - Successfully create a new todo
     Given I have a todo with title "<title>" and description "<description>"
     When I create the todo
@@ -20,7 +19,6 @@ Feature: Create new todos
       | Buy groceries | Get milk, eggs, and bread  |
       | Call dentist  | Schedule annual checkup    |
 
-  @focus
   Scenario Outline: Error Flow - Attempt to create a todo with missing required fields
     Given I have a todo with missing field "<field>"
     When I try to create the todo
@@ -31,7 +29,6 @@ Feature: Create new todos
       | field | message                    |
       | title | title : field is mandatory |
 
-  @focus
   Scenario Outline: Alternate Flow - Create a todo with optional fields
     Given I have a todo with title "<title>" and the following optional fields
       | field       | value          |

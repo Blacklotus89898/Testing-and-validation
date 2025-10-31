@@ -14,14 +14,21 @@ dependencies {
     implementation 'org.json:json:20230618'
     
     // Cucumber
-    testImplementation 'io.cucumber:cucumber-java:7.14.0'
-    testImplementation 'io.cucumber:cucumber-junit:7.14.0'
-    testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.14.0'
+    testImplementation platform('io.cucumber:cucumber-bom:7.14.0')
+    testImplementation 'io.cucumber:cucumber-java'
+    testImplementation 'io.cucumber:cucumber-junit'
+    testImplementation 'io.cucumber:cucumber-junit-platform-engine'
+    testImplementation 'io.cucumber:cucumber-core'
+    testImplementation 'io.cucumber:cucumber-gherkin'
+    testImplementation 'io.cucumber:cucumber-plugin'
+    testImplementation 'io.cucumber:ci-environment'
+    testImplementation 'io.cucumber:cucumber-picocontainer'
     
     // JUnit
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.0'
     testImplementation 'org.junit.platform:junit-platform-suite-engine:1.10.0'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.10.0'
     
     // REST Assured and Hamcrest
     testImplementation 'io.rest-assured:rest-assured:5.3.1'

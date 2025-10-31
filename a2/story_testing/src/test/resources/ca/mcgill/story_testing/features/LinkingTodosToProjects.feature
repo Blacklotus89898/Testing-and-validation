@@ -7,7 +7,6 @@ Feature: Linking todos to projects
     Given the Todos API service is running
     And the system has been reset to a clean state
 
-  @focus
   Scenario: Normal Flow - Successfully link a todo to a project
     Given a project already exists in the system
     When I create a todo with title "New Todo" and description "To be linked"
@@ -16,7 +15,6 @@ Feature: Linking todos to projects
     Then the operation should succeed with status 201
     And the todo should appear as linked to the project
 
-  @focus
   Scenario: Error Flow - Attempt to link a todo to an invalid project
     When I create a todo with title "New Todo" and description "To be linked"
     Then the operation should succeed with status 201
@@ -24,7 +22,6 @@ Feature: Linking todos to projects
     Then the operation should fail with status 404
     And the error message should include "Could not find thing matching value for id"
 
-  @focus
   Scenario: Alternate Flow - Link todo without specifying a project (Known Bug)
     When I create a todo with title "New Todo" and description "To be linked"
     Then the operation should succeed with status 201
