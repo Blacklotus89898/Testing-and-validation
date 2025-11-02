@@ -112,6 +112,13 @@ public class TodoStepDefinitions {
         currentFields.put("description", description);
     }
 
+    @Given("I have a project with title {string} and description {string}")
+    public void prepareProjectWithTitleAndDescription(String title, String description) {
+        currentFields = new HashMap<>();
+        currentFields.put("title", title);
+        currentFields.put("description", description);
+    }
+
     @Given("I have a todo with missing field {string}")
     public void prepareTodoWithMissingField(String field) {
         currentFields = new HashMap<>();
@@ -124,8 +131,33 @@ public class TodoStepDefinitions {
         }
     }
 
+    @Given("I have a project with missing field {string}")
+    public void prepareProjectWithMissingField(String field) {
+        currentFields = new HashMap<>();
+        // Add all required fields except the one that should be missing
+        // if (!field.equals("title")) {
+        //     currentFields.put("title", "Default Title");
+        // }
+        // if (!field.equals("description")) {
+        //     currentFields.put("description", "Default Description");
+        // }
+    }
+
     @Given("I have a todo with title {string} and the following optional fields")
     public void prepareTodoWithOptionalFields(String title, DataTable fields) {
+        currentFields = new HashMap<>();
+        currentFields.put("title", title);
+        
+        List<Map<String, String>> rows = fields.asMaps(String.class, String.class);
+        for (Map<String, String> row : rows) {
+            String fieldName = row.get("field");
+            String fieldValue = row.get("value");
+            currentFields.put(fieldName, fieldValue);
+        }
+    }
+  
+    @Given("I have a project with title {string} and the following optional fields")
+    public void prepareProjectWithOptionalFields(String title, DataTable fields) {
         currentFields = new HashMap<>();
         currentFields.put("title", title);
         
@@ -153,7 +185,7 @@ public class TodoStepDefinitions {
     @Given("a project already exists in the system")
     public void verifyProjectExists() throws IOException, InterruptedException {
         JSONObject projectData = new JSONObject();
-        projectData.put("title", "Existing Project");
+        projectData.put("title", "Original Title");
         projectData.put("description", "An existing project for testing");
         response = sendRequest("POST", "/projects", projectData.toString());
         assertEquals(201, response.statusCode(), "Project should be created successfully");
@@ -189,6 +221,21 @@ public class TodoStepDefinitions {
         assertEquals(201, response.statusCode(), "Second todo should be created successfully");
     }
 
+    @Given("there are existing projects in the system")
+    public void createExistingprojects() throws IOException, InterruptedException {
+        // Create first todo
+        JSONObject firstProject = new JSONObject();
+        firstProject.put("title", "First Project");
+        response = sendRequest("POST", "/projects", firstProject.toString());
+        assertEquals(201, response.statusCode(), "First Project should be created successfully");
+
+        // Create second Project
+        JSONObject secondProject = new JSONObject();
+        secondProject.put("title", "Second Project");
+        response = sendRequest("POST", "/projects", secondProject.toString());
+        assertEquals(201, response.statusCode(), "Second todo should be created successfully");
+    }
+
     @Given("the system has no todos")
     public void ensureSystemHasNoTodos() {
         try {
@@ -217,6 +264,34 @@ public class TodoStepDefinitions {
         }
     }
 
+    @Given("the system has no projects")
+    public void ensureSystemHasNoprojects() {
+        try {
+            response = sendRequest("GET", "/projects", null);
+            assertEquals(200, response.statusCode(), "GET /projects should return 200");
+
+            JSONObject resp = new JSONObject(response.body());
+            if (resp.has("projects")) {
+                JSONArray projects = resp.getJSONArray("projects");
+                for (int i = 0; i < projects.length(); i++) {
+                    JSONObject todo = projects.getJSONObject(i);
+                    String id = todo.has("id") ? todo.get("id").toString() : String.valueOf(todo.getInt("id"));
+                    sendRequest("DELETE", "/projects/" + id, null);
+                }
+
+                // Verify cleanup
+                response = sendRequest("GET", "/projects", null);
+                JSONObject resp2 = new JSONObject(response.body());
+                JSONArray projects2 = resp2.getJSONArray("projects");
+                assertEquals(0, projects2.length(), "Expected no projects after cleanup");
+            } else {
+                // If no "projects" field, assume empty or not applicable
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to ensure system has no projects", e);
+        }
+    }
+
     // Action steps - Creation
     @When("I create the todo")
     public void createTodo() throws IOException, InterruptedException {
@@ -236,6 +311,25 @@ public class TodoStepDefinitions {
             lastCreatedTodo = new JSONObject(response.body());
         }
     }
+    
+    @When("I create the project")
+    public void createProject() throws IOException, InterruptedException {
+        JSONObject projectData = new JSONObject();
+        // Convert doneStatus string to boolean if present
+        for (Map.Entry<String, String> entry : currentFields.entrySet()) {
+            if (entry.getKey().equals("completed") || entry.getKey().equals("active")) {
+                projectData.put(entry.getKey(), Boolean.parseBoolean(entry.getValue()));
+            } else {
+                projectData.put(entry.getKey(), entry.getValue());
+            }
+        }
+        requestBody = projectData.toString();
+        response = sendRequest("POST", "/projects", requestBody);
+        if (response.statusCode() == 201) {
+            lastCreatedResource = new JSONObject(response.body()); // Keep for backward compatibility
+            lastCreatedTodo = new JSONObject(response.body());
+        }
+    }
 
     @When("I try to create the todo")
     public void attemptToCreateTodo() {
@@ -250,6 +344,24 @@ public class TodoStepDefinitions {
             } else {
                 lastCreatedResource = null;
                 lastCreatedTodo = null;
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to send create request", e);
+        }
+    }
+    @When("I try to create the project")
+    public void attemptToCreateproject() {
+        JSONObject projectData = new JSONObject(currentFields);
+        requestBody = projectData.toString();
+        try {
+            response = sendRequest("POST", "/projects", requestBody);
+            // Expecting a client error (e.g., 400). Do not populate lastCreatedResource on failure.
+            if (response.statusCode() == 201) {
+                lastCreatedResource = new JSONObject(response.body()); // Keep for backward compatibility
+                lastCreatedProject = new JSONObject(response.body());
+            } else {
+                lastCreatedResource = null;
+                lastCreatedProject = null;
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to send create request", e);
@@ -275,10 +387,20 @@ public class TodoStepDefinitions {
     public void requestAllTodos() throws IOException, InterruptedException {
         response = sendRequest("GET", "/todos", null);
     }
+ 
+    @When("I request all projects")
+    public void requestAllProjects() throws IOException, InterruptedException {
+        response = sendRequest("GET", "/projects", null);
+    }
 
     @When("I request the todo with id {int}")
     public void requestSpecificTodo(int id) throws IOException, InterruptedException {
         response = sendRequest("GET", "/todos/" + id, null);
+    }
+
+    @When("I request the project with id {int}")
+    public void requestSpecificProject(int id) throws IOException, InterruptedException {
+        response = sendRequest("GET", "/projects/" + id, null);
     }
 
     // Action steps - Update
@@ -300,6 +422,28 @@ public class TodoStepDefinitions {
             // Fallback to todo/1 if no todo was created in previous step
             response = sendRequest("PUT", "/todos/1", updateData.toString());
         }
+    }
+   
+    @When("I update the project with a new title")
+    public void updateProjectTitle() throws IOException, InterruptedException {
+        JSONObject updateData = new JSONObject();
+        updateData.put("title", "Updated Title");
+
+        // Get the ID of the last created project
+        String projectId = lastCreatedProject.getString("id");
+
+        // String projectId;
+        // if (lastCreatedResource != null) {
+        //     if (lastCreatedResource.has("projects")) {
+        //         projectId = lastCreatedResource.getJSONArray("projects").getJSONObject(0).getString("id");
+        //     } else {
+        //         projectId = lastCreatedResource.getString("id");
+        //     }
+            response = sendRequest("PUT", "/projects/" + projectId, updateData.toString());
+        // } else {
+        //     // Fallback to project/1 if no project was created in previous step
+        //     response = sendRequest("PUT", "/projects/1", updateData.toString());
+        // }
     }
 
 
@@ -323,10 +467,38 @@ public class TodoStepDefinitions {
         response = sendRequest("POST", "/todos/" + todoId, updateData.toString());
     }
 
+    @When("I update the project by adding a description")
+    public void updateProjectDescription() throws IOException, InterruptedException {
+        JSONObject updateData = new JSONObject();
+        updateData.put("description", "Updated description");
+
+        // Get the ID of the last created todo
+        // String projectId;
+        // if (lastCreatedResource != null) {
+        //     if (lastCreatedResource.has("projects")) {
+        //         projectId = lastCreatedResource.getJSONArray("projects").getJSONObject(0).getString("id");
+        //     } else {
+        //         projectId = lastCreatedResource.getString("id");
+        //     }
+        // } else {
+        //     projectId = "1"; // Fallback to todo/1 if no todo was created
+        // }
+
+        String projectId = lastCreatedProject.getString("id");
+
+        response = sendRequest("POST", "/projects/" + projectId, updateData.toString());
+    }
+
     @When("I attempt to update a todo that does not exist")
     public void attemptUpdateNonexistentTodo() throws IOException, InterruptedException {
         JSONObject updateData = new JSONObject(currentFields);
         response = sendRequest("PUT", "/todos/999999", updateData.toString());
+    }
+    
+    @When("I attempt to update a project that does not exist")
+    public void attemptUpdateNonexistentProject() throws IOException, InterruptedException {
+        JSONObject updateData = new JSONObject(currentFields);
+        response = sendRequest("PUT", "/projects/999999", updateData.toString());
     }
 
     // Action steps - Linking
@@ -507,6 +679,39 @@ public class TodoStepDefinitions {
         }
     }
 
+    // Action steps Deletion
+    @When("I delete the todo")
+    public void deleteTodo() throws IOException, InterruptedException {
+         String todoId = lastCreatedTodo.getString("id");
+            response = sendRequest("DELETE", "/todos/" + todoId, null);
+    }
+
+    @When("I delete the project")
+    public void deleteProject() throws IOException, InterruptedException {
+         String projectId = lastCreatedProject.getString("id");
+            response = sendRequest("DELETE", "/projects/" + projectId, null);
+    }
+
+    @When("I attempt to delete a todo that does not exist")
+    public void attemptDeleteNonexistentTodo() throws IOException, InterruptedException {
+        response = sendRequest("DELETE", "/todos/999999", null);  
+    }
+
+    @When("I attempt to delete a project that does not exist")
+    public void attemptDeleteNonexistentProject() throws IOException, InterruptedException {
+        response = sendRequest("DELETE", "/projects/999999", null);  
+    }
+
+    @When("I attempt to delete a todo without Id")
+    public void attemptDeleteTodoWihtoutId() throws IOException, InterruptedException {
+        response = sendRequest("DELETE", "/todos", null);
+    }
+
+    @When("I attempt to delete a project without Id")
+    public void attemptDeleteprojectWihtoutId() throws IOException, InterruptedException {
+        response = sendRequest("DELETE", "/projects", null);
+    }
+
     // Response verification steps
     @Then("the operation should succeed with status {int}")
     public void verifySuccessStatus(int expectedStatus) {
@@ -517,6 +722,23 @@ public class TodoStepDefinitions {
     public void verifyFailureStatus(int expectedStatus) {
         assertEquals(expectedStatus, response.statusCode(), "Operation should have failed with status " + expectedStatus);
     }
+
+@Then("The todo should no longer exist with status {int}")
+public void verifyNonExistenceTodoStatus(int expectedStatus) throws IOException, InterruptedException {
+    String todoId = lastCreatedTodo.optString("id", null);
+
+    response = sendRequest("GET", "/todos/" + todoId, null);
+    assertEquals(expectedStatus, response.statusCode(), "Expected status code mismatch when verifying todo non-existence.");
+}
+
+@Then("The project should no longer exist with status {int}")
+public void verifyNonExistenceProjectStatus(int expectedStatus) throws IOException, InterruptedException {
+    String projectId = lastCreatedProject.optString("id", null);
+
+    response = sendRequest("GET", "/projects/" + projectId, null);
+    assertEquals(expectedStatus, response.statusCode(), "Expected status code mismatch when verifying project non-existence.");
+}
+
 
     @Then("the error message should include {string}")
     public void verifyErrorMessage(String expectedError) {
@@ -591,6 +813,18 @@ public class TodoStepDefinitions {
         }
     }
 
+    @Then("the created project should include the title {string}")
+    public void verifyProjectTitle(String expectedTitle) {
+        JSONObject responseObject = new JSONObject(response.body());
+        if (responseObject.has("projects")) {
+            JSONObject project = responseObject.getJSONArray("projects").getJSONObject(0);
+            assertEquals(expectedTitle, project.getString("title"), "Todo title should match the expected value");
+        } else {
+            assertEquals(expectedTitle, responseObject.getString("title"), "Todo title should match the expected value");
+        }
+    }
+
+
     @Then("the created todo should include the description {string}")
     public void verifyTodoDescription(String expectedDescription) {
         JSONObject responseObject = new JSONObject(response.body());
@@ -617,6 +851,20 @@ public class TodoStepDefinitions {
             "Todo should have a non-empty description");
     }
 
+    @Then("the created project should include the optional fields")
+    public void verifyProjectOptionalFields() {
+        JSONObject responseObject = new JSONObject(response.body());
+        JSONObject project;
+        if (responseObject.has("projects")) {
+            project = responseObject.getJSONArray("projects").getJSONObject(0);
+        } else {
+            project = responseObject;
+        }
+
+        assertTrue(project.has("completed"), "project should have completed field");
+        assertTrue(project.has("active") ,"project should have a status field");
+    }
+
     @Then("the response should include a list of todos")
     public void verifyTodosList() {
         JSONObject responseObject = new JSONObject(response.body());
@@ -625,12 +873,28 @@ public class TodoStepDefinitions {
         assertTrue(todos.length() > 0, "Response should contain at least one todo");
     }
 
+    @Then("the response should include a list of projects")
+    public void verifyProjectList() {
+        JSONObject responseObject = new JSONObject(response.body());
+        assertTrue(responseObject.has("projects"), "Response should contain projects field");
+        JSONArray projects = responseObject.getJSONArray("projects");
+        assertTrue(projects.length() > 0, "Response should contain at least one project");
+    }
+
     @Then("the response should include an empty list")
     public void verifyEmptyList() {
         JSONObject responseObject = new JSONObject(response.body());
         assertTrue(responseObject.has("todos"), "Response should contain todos field");
         JSONArray todos = responseObject.getJSONArray("todos");
         assertEquals(0, todos.length(), "Response should contain an empty list of todos");
+    }
+
+    @Then("the response should include an empty project list")
+    public void verifyEmptyProjectList() {
+        JSONObject responseObject = new JSONObject(response.body());
+        assertTrue(responseObject.has("projects"), "Response should contain projects field");
+        JSONArray projects = responseObject.getJSONArray("projects");
+        assertEquals(0, projects.length(), "Response should contain an empty list of projects");
     }
 
     @Then("the todo should appear as linked to the project")
@@ -845,6 +1109,35 @@ public class TodoStepDefinitions {
         }
     }
 
+    @Then("the project's title should reflect the updated value")
+    public void verifyUpdatedProjectTitle() throws IOException, InterruptedException {
+        // Get the ID of the last created todo
+        // String projectId;
+        // if (lastCreatedResource != null) {
+        //     if (lastCreatedResource.has("projects")) {
+        //         projectId = lastCreatedResource.getJSONArray("projects").getJSONObject(0).getString("id");
+        //     } else {
+        //         projectId = lastCreatedResource.getString("id");
+        //     }
+        // } else {
+        //     projectId = "1"; // Fallback to todo/1 if no todo was created
+        // }
+
+        String projectId = lastCreatedProject.getString("id");
+
+        // Get the latest state of the todo
+        response = sendRequest("GET", "/projects/" + projectId, null);
+        JSONObject responseObject = new JSONObject(response.body());
+        
+        String expectedTitle = "Updated Title";
+        if (responseObject.has("projects")) {
+            JSONObject todo = responseObject.getJSONArray("projects").getJSONObject(0);
+            assertEquals(expectedTitle, todo.getString("title"), "Todo title should be updated");
+        } else {
+            assertEquals(expectedTitle, responseObject.getString("title"), "Todo title should be updated");
+        }
+    }
+
     @Then("the todo's description should reflect the updated value")
     public void verifyUpdatedDescription() throws IOException, InterruptedException {
         // Get the ID of the last created todo
@@ -872,6 +1165,35 @@ public class TodoStepDefinitions {
         }
     }
 
+    @Then("the project's description should reflect the updated value")
+    public void verifyUpdatedProjectDescription() throws IOException, InterruptedException {
+        // Get the ID of the last created todo
+        // String projectId;
+        // if (lastCreatedResource != null) {
+        //     if (lastCreatedResource.has("projects")) {
+        //         projectId = lastCreatedResource.getJSONArray("projects").getJSONObject(0).getString("id");
+        //     } else {
+        //         projectId = lastCreatedResource.getString("id");
+        //     }
+        // } else {
+        //     projectId = "1"; // Fallback to todo/1 if no todo was created
+        // }
+
+        String projectId = lastCreatedProject.getString("id");
+
+        // Get the latest state of the todo
+        response = sendRequest("GET", "/projects/" + projectId, null);
+        JSONObject responseObject = new JSONObject(response.body());
+        
+        String expectedDescription = "Updated description";
+        if (responseObject.has("projects")) {
+            JSONObject todo = responseObject.getJSONArray("projects").getJSONObject(0);
+            assertEquals(expectedDescription, todo.getString("description"), "Todo description should be updated");
+        } else {
+            assertEquals(expectedDescription, responseObject.getString("description"), "Todo description should be updated");
+        }
+    }
+
     @Then("the todo's title should remain unchanged")
     public void verifyUnchangedTitle() throws IOException, InterruptedException {
         // Get the ID of the last created todo
@@ -893,6 +1215,34 @@ public class TodoStepDefinitions {
         String expectedTitle = "Original Title";
         if (responseObject.has("todos")) {
             JSONObject todo = responseObject.getJSONArray("todos").getJSONObject(0);
+            assertEquals(expectedTitle, todo.getString("title"), "Todo title should remain unchanged");
+        } else {
+            assertEquals(expectedTitle, responseObject.getString("title"), "Todo title should remain unchanged");
+        }
+    }
+
+    @Then("the project's title should remain unchanged")
+    public void verifyUnchangedProjectTitle() throws IOException, InterruptedException {
+        // Get the ID of the last created todo
+        // String projectId;
+        // if (lastCreatedResource != null) {
+        //     if (lastCreatedResource.has("projects")) {
+        //         projectId = lastCreatedResource.getJSONArray("projects").getJSONObject(0).getString("id");
+        //     } else {
+        //         projectId = lastCreatedResource.getString("id");
+        //     }
+        // } else {
+        //     projectId = "1"; // Fallback to todo/1 if no todo was created
+        // }
+        String projectId = lastCreatedProject.getString("id");
+
+        // Get the latest state of the todo
+        response = sendRequest("GET", "/projects/" + projectId, null);
+        JSONObject responseObject = new JSONObject(response.body());
+        
+        String expectedTitle = "Original Title";
+        if (responseObject.has("projects")) {
+            JSONObject todo = responseObject.getJSONArray("projects").getJSONObject(0);
             assertEquals(expectedTitle, todo.getString("title"), "Todo title should remain unchanged");
         } else {
             assertEquals(expectedTitle, responseObject.getString("title"), "Todo title should remain unchanged");
