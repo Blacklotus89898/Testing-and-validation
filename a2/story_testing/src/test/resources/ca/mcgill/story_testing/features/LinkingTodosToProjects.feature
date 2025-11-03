@@ -29,4 +29,4 @@ Feature: Linking todos to projects
     Then the operation should succeed with status 201
     And a new empty project should be created and linked to the todo
     And the response should show the new project associated with the todo
-    # Known Bug: The system should reject this request, but instead creates a new project automatically.
+    # Bug: The system should reject this request, but instead creates a new project automatically.

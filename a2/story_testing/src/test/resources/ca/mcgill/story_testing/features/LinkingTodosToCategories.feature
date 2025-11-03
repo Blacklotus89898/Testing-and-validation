@@ -26,4 +26,4 @@ Feature: Linking todos to categories
     When I attempt to link a todo to a category using a title instead of an ID
     Then the operation should succeed with status 201
     And a new category should be created and linked to the todo
-    # Known Bug: The API incorrectly allows linking by title, creating an unintended category instead of returning an error.
+    # Bug: The API incorrectly allows linking by title, creating an unintended category instead of returning an error.
