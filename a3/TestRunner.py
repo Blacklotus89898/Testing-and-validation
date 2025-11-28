@@ -1,7 +1,8 @@
 import time
 import requests
 import sys
-from PerformanceTester import RestPerformanceTester
+from tester.TodoTester import TodoTester
+from tester.ProjectTester import ProjectTester
 
 # Configuration
 API_URL = "http://localhost:4567"
@@ -21,23 +22,38 @@ def main():
         print("   Please ensure the Part A server is running.")
         sys.exit(1)
 
-    tester = RestPerformanceTester(API_URL)
+    # Instantiate our specific testers
+    testers = [
+        ("Todo", TodoTester(API_URL)),
+        ("Project", ProjectTester(API_URL))
+    ]
+
     all_results = []
 
-    # 2. Run experiments for each load level
-    for load in LOAD_LEVELS:
-        result = tester.run_experiment(load)
-        all_results.append(result)
-        # Optional: Cool-down pause between tests
-        time.sleep(1)
+    # 2. Run experiments for each tester and each load level
+    for name, tester in testers:
+        print(f"\n--- Testing Object Type: {name} ---")
+        
+        for load in LOAD_LEVELS:
+            # Run the experiment
+            result = tester.run_experiment(load)
+            
+            # Inject the 'type' name into the result dictionary
+            result['type'] = name 
+            all_results.append(result)
+            
+            # Optional: Cool-down pause between tests
+            time.sleep(1)
 
     # 3. Print Final Summary Table
-    print("\n" + "="*85)
-    print(f"{'Objects':<10} | {'Create(s)':<12} | {'Update(s)':<12} | {'Delete(s)':<12} | {'CPU%':<8} | {'Free RAM'}")
-    print("-" * 85)
+    # I widened the columns slightly to fit the headers nicely
+    print("\n" + "="*130)
+    print(f"{'Type':<8} | {'Objects':<8} | {'Create(s)':<10} | {'Update(s)':<10} | {'Delete(s)':<10} | {'Abs CPU%':<10} | {'Rel CPU%':<10} | {'Abs Free MB':<12} | {'Rel Used MB'}")
+    print("-" * 130)
+    
     for r in all_results:
-        print(f"{r['load_count']:<10} | {r['create_time_sec']:<12} | {r['update_time_sec']:<12} | {r['delete_time_sec']:<12} | {r['avg_cpu_percent']:<8} | {r['avg_memory_free_mb']} MB")
-    print("="*85)
+        print(f"{r['type']:<8} | {r['load_count']:<8} | {r['create_time_sec']:<10} | {r['update_time_sec']:<10} | {r['delete_time_sec']:<10} | {r['avg_cpu_percent']:<10} | {r['rel_cpu_increase']:<10} | {r['avg_memory_free_mb']:<12} | {r['rel_mem_consumed_mb']} MB")
+    print("="*130)
 
 if __name__ == "__main__":
     main()
